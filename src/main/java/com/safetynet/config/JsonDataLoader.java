@@ -1,8 +1,10 @@
 package com.safetynet.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -17,16 +19,19 @@ import tools.jackson.databind.ObjectMapper;
 public class JsonDataLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonDataLoader.class);
+    @Getter
     private SafetyNetData safetyNetData;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private File dataFile;
 
     @PostConstruct
     public void init() {
 
         logger.debug("Début du chargement du fichier data.json");
 
-        try (InputStream inputStream = new ClassPathResource("data.json").getInputStream()) {
-            safetyNetData = objectMapper.readValue(inputStream, SafetyNetData.class);
+        try {
+            dataFile = new ClassPathResource("data.json").getFile();
+            safetyNetData = objectMapper.readValue(dataFile, SafetyNetData.class);
 
             logger.info("Fichier JSON chargé avec succès !");
             logger.info("Personnes chargées : {}", safetyNetData.getPersons().size());
@@ -44,7 +49,13 @@ public class JsonDataLoader {
         }
     }
 
-    public SafetyNetData getSafetyNetData() {
-        return safetyNetData;
+    public void saveData() {
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(dataFile, safetyNetData);
+            logger.info("Fichier data.json sauvegardé avec succès");
+        } catch (Exception e) {
+            logger.error("Erreur lorsde la sauvegarde du fichier data.json", e);
+            throw new RuntimeException("Erreur lors de la sauvegarde du fichier data.json", e);
+        }
     }
 }
