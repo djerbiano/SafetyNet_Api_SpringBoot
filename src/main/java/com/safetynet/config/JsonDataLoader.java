@@ -1,13 +1,10 @@
 package com.safetynet.config;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import com.safetynet.model.SafetyNetData;
@@ -30,7 +27,7 @@ public class JsonDataLoader {
         logger.debug("Début du chargement du fichier data.json");
 
         try {
-            dataFile = new ClassPathResource("data.json").getFile();
+            dataFile = new File("src/main/resources/data.json");
             safetyNetData = objectMapper.readValue(dataFile, SafetyNetData.class);
 
             logger.info("Fichier JSON chargé avec succès !");
@@ -43,7 +40,7 @@ public class JsonDataLoader {
                             safetyNetData.getFirestations().size() +
                             safetyNetData.getMedicalrecords().size());
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Erreur lors du chargement du fichier data.json", e);
             throw new RuntimeException("Erreur lors du chargement du fichier data.json", e);
         }
