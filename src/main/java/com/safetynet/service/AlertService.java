@@ -84,6 +84,16 @@ public class AlertService {
     }
 
     // GET /phoneAlert?firestation=<firestation_number>
+    public List<String> getPhonesByStation(String stationNumber) {
+        logger.debug("Recherche téléphone pour station : {}", stationNumber);
+        List<String> addresses = firestationRepository.findByStation(stationNumber)
+                .stream().map(firestation -> firestation.getAddress()).toList();
+
+        return personRepository.findAll().stream()
+                .filter(p -> addresses.contains(p.getAddress()))
+                .map(p -> p.getPhone())
+                .toList();
+    }
 
     // GET /fire?address=<address>
 
@@ -92,8 +102,6 @@ public class AlertService {
     //GET /personInfolastName=<lastName>
 
     //GET /communityEmail?city=<city>
-
-
 
 
 }
