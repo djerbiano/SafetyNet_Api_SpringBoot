@@ -1,8 +1,6 @@
 package com.safetynet.service;
 
-import com.safetynet.dto.ChildAlertDTO;
-import com.safetynet.dto.FirestationCoverageDTO;
-import com.safetynet.dto.PersonInfoDTO;
+import com.safetynet.dto.*;
 import com.safetynet.model.Firestation;
 import com.safetynet.model.MedicalRecord;
 import com.safetynet.model.Person;
@@ -96,6 +94,27 @@ public class AlertService {
     }
 
     // GET /fire?address=<address>
+    public FireAlertDTO getResidentsByAddress(String address) {
+        logger.debug("Recherche résidents pour station : {}", address);
+
+        String station = firestationRepository.findByAddress(address)
+                .map(firestation -> firestation.getAddress())
+                .orElse("Inconnue");
+        List<ResidentDTO> residents = personRepository.findByAddress(address).stream()
+                .map(p -> {
+                            MedicalRecord mr = getMedicalRecord(p.getFirstName(), p.getLastName())
+                                    .orElse(null);
+                            int age = mr != null ? AgeUtil.calculateAge(mr.getBirthdate()) : 0;
+                            List<String> meds = mr != null ? mr.getMedications() : List.of();
+                            List<String> allergies = mr != null ? mr.getAllergies() : List.of();
+                            return new ResidentDTO(p.getFirstName(), p.getLastName(), p.getPhone(), age, meds, allergies);
+                        }
+                )
+                .toList();
+        return new FireAlertDTO(station, residents);
+
+
+    }
 
     // GET /flood/stations?stations=<a list of station_numbers>
 
