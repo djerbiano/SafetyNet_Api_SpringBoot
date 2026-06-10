@@ -147,6 +147,10 @@ public class AlertService {
 
 
     //GET /communityEmail?city=<city>
+    public List<String> getEmailsByCity(String city) {
+        logger.debug("Recherche emails pour ville : {}", city);
+        return personRepository.findByCity(city).stream().map(p -> p.getEmail()).toList();
+    }
 
 
 }
