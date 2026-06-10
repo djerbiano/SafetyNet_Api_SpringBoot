@@ -130,6 +130,22 @@ public class AlertService {
 
 
     //GET /personInfolastName=<lastName>
+    public List<PersonDetailDTO> getPersonInfoByLastName(String lastName) {
+        logger.debug("Recherche info pour lastName : {}", lastName);
+        return personRepository.findByLastName(lastName).stream()
+                .map(p -> {
+                    MedicalRecord mr = getMedicalRecord(p.getFirstName(), p.getLastName())
+                            .orElse(null);
+                    int age = mr != null ? AgeUtil.calculateAge(mr.getBirthdate()) : 0;
+                    List<String> meds = mr != null ? mr.getMedications() : List.of();
+                    List<String> allergies = mr != null ? mr.getAllergies() : List.of();
+                    return new PersonDetailDTO(p.getFirstName(), p.getAddress(), age, p.getEmail(), meds, allergies);
+                })
+                .toList();
+
+    }
+
+
     //GET /communityEmail?city=<city>
 
 
