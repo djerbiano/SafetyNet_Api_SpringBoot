@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AlertService {
@@ -31,6 +30,20 @@ public class AlertService {
     // privé pour DRY
     private Optional<MedicalRecord> getMedicalRecord(String firstName, String lastName) {
         return medicalRecordRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    // privé pour DRY
+    private List<ResidentDTO> buildResidentList(String address) {
+        return personRepository.findByAddress(address).stream()
+                .map(p -> {
+                    MedicalRecord mr = getMedicalRecord(p.getFirstName(), p.getLastName())
+                            .orElse(null);
+                    int age = mr != null ? AgeUtil.calculateAge(mr.getBirthdate()) : 0;
+                    List<String> meds = mr != null ? mr.getMedications() : List.of();
+                    List<String> allergies = mr != null ? mr.getAllergies() : List.of();
+                    return new ResidentDTO(p.getFirstName(), p.getLastName(), p.getPhone(), age, meds, allergies);
+                })
+                .toList();
     }
 
     // GET /firestation?stationNumber=<station_number>
@@ -100,26 +113,23 @@ public class AlertService {
         String station = firestationRepository.findByAddress(address)
                 .map(firestation -> firestation.getAddress())
                 .orElse("Inconnue");
-        List<ResidentDTO> residents = personRepository.findByAddress(address).stream()
-                .map(p -> {
-                            MedicalRecord mr = getMedicalRecord(p.getFirstName(), p.getLastName())
-                                    .orElse(null);
-                            int age = mr != null ? AgeUtil.calculateAge(mr.getBirthdate()) : 0;
-                            List<String> meds = mr != null ? mr.getMedications() : List.of();
-                            List<String> allergies = mr != null ? mr.getAllergies() : List.of();
-                            return new ResidentDTO(p.getFirstName(), p.getLastName(), p.getPhone(), age, meds, allergies);
-                        }
-                )
-                .toList();
-        return new FireAlertDTO(station, residents);
+
+        return new FireAlertDTO(station, buildResidentList(address));
 
 
     }
 
     // GET /flood/stations?stations=<a list of station_numbers>
+    public Map<String, List<ResidentDTO>> getHouseholdsByStations(List<String> stations) {
+        logger.debug("Recherche foyers pour stations : {}", stations);
+        Map<String, List<ResidentDTO>> result = new LinkedHashMap<>();
+        stations.forEach(station -> firestationRepository.findByStation(station).forEach(f ->
+                result.merge(f.getAddress(), buildResidentList(f.getAddress()), (existing, newList) -> existing)));
+        return result;
+    }
+
 
     //GET /personInfolastName=<lastName>
-
     //GET /communityEmail?city=<city>
 
 
