@@ -3,8 +3,6 @@ package com.safetynet.repository;
 import com.safetynet.config.JsonDataLoader;
 import com.safetynet.model.MedicalRecord;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
