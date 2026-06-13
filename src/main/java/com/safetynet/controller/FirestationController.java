@@ -35,7 +35,7 @@ public class FirestationController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteFirestation(@RequestBody String address) {
+    public ResponseEntity<Void> deleteFirestation(@RequestParam String address) {
         logger.info("DELETE /firestation - Suppression : {}", address);
         firestationService.delete(address);
         logger.info("DELETE /firestation - Réponse 204");

@@ -16,8 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.assertj.core.api.Assertions.*;
+
 
 @WebMvcTest(PersonController.class)
 @AutoConfigureMockMvc
@@ -66,7 +65,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    void updatePerson_shouldReturn500_whenNotFound() throws Exception {
+    void updatePerson_shouldReturn500_whenNotFound()  {
         when(personService.update(any(Person.class))).thenThrow(new RuntimeException("Personne non trouvée"));
         assertThrows(Exception.class, () -> mockMvc.perform(put("/person")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +82,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    void deletePerson_shouldReturn500_whenNotFound() throws Exception {
+    void deletePerson_shouldReturn500_whenNotFound() {
         doThrow(new RuntimeException("Personne non trouvée pour suppression")).when(personService).delete("Unknown", "Person");
         assertThrows(Exception.class, () -> mockMvc.perform(delete("/person")
                 .param("firstName", "Unknown")
