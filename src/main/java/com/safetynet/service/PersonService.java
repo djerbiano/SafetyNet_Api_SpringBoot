@@ -21,9 +21,6 @@ public class PersonService {
         this.jsonDataLoader = jsonDataLoader;
     }
 
-    public List<Person> getAll() {
-        return personRepository.findAll();
-    }
 
     public Person add(Person person) {
         logger.debug("Ajout d'une personne : {} {}", person.getFirstName(), person.getLastName());
