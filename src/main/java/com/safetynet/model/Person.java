@@ -2,6 +2,9 @@ package com.safetynet.model;
 
 import lombok.Data;
 
+/**
+ * Représente une personne dans le système SafetyNet. * Contient les informations personnelles et de contact.
+ */
 @Data
 public class Person {
     private String firstName;
