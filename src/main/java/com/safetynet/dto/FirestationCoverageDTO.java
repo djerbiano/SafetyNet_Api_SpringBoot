@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * DTO représentant la couverture d'une caserne de pompiers.
+ * Inclut la liste des personnes couvertes et le décompte adultes/enfants.
+ */
 @Data
 @AllArgsConstructor
 public class FirestationCoverageDTO {

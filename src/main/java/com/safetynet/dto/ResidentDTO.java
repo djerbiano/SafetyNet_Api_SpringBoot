@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * DTO représentant un résident avec ses informations médicales.
+ */
 @Data
 @AllArgsConstructor
 public class ResidentDTO {

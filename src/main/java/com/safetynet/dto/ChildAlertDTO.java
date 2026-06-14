@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * DTO représentant un enfant et les membres de foyer.
+ */
 @Data
 @AllArgsConstructor
 public class ChildAlertDTO {

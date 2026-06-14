@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * DTO représentant les informations détaillées d'une personne.
+ * Inclut les informations personnelles et médicales complètes.
+ */
 @Data
 @AllArgsConstructor
 public class PersonDetailDTO {
