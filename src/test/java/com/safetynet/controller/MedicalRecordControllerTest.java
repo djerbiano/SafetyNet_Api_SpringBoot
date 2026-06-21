@@ -11,7 +11,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -67,10 +66,15 @@ public class MedicalRecordControllerTest {
 
     @Test
     void updateMedicalRecord_shouldReturn500_whenNotFound() throws Exception {
-        when(medicalRecordService.update(any(MedicalRecord.class))).thenThrow(new RuntimeException("Dossier médical non trouvé"));
-        assertThrows(Exception.class, () ->  mockMvc.perform(put("/medicalRecord")
+        when(medicalRecordService.update(any(MedicalRecord.class)))
+                .thenThrow(new RuntimeException("Dossier médical non trouvé"));
+
+        mockMvc.perform(put("/medicalRecord")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(medicalRecord))));
+                        .content(objectMapper.writeValueAsString(medicalRecord)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 
     @Test
@@ -84,9 +88,14 @@ public class MedicalRecordControllerTest {
 
     @Test
     void deleteMedicalRecord_shouldReturn500_whenNotFound() throws Exception {
-        doThrow(new RuntimeException("Dossier médical non trouvé")).when(medicalRecordService).delete("Unknown", "Person");
-        assertThrows(Exception.class, () ->  mockMvc.perform(delete("/medicalRecord")
+        doThrow(new RuntimeException("Dossier médical non trouvé"))
+                .when(medicalRecordService).delete("Unknown", "Person");
+
+        mockMvc.perform(delete("/medicalRecord")
                         .param("firstName", "Unknown")
-                        .param("lastName", "Person")));
+                        .param("lastName", "Person"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
@@ -65,11 +64,16 @@ public class PersonControllerTest {
     }
 
     @Test
-    void updatePerson_shouldReturn500_whenNotFound()  {
-        when(personService.update(any(Person.class))).thenThrow(new RuntimeException("Personne non trouvée"));
-        assertThrows(Exception.class, () -> mockMvc.perform(put("/person")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(john))));
+    void updatePerson_shouldReturn500_whenNotFound() throws Exception {
+        when(personService.update(any(Person.class)))
+                .thenThrow(new RuntimeException("Personne non trouvée"));
+
+        mockMvc.perform(put("/person")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(john)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 
     @Test
@@ -82,10 +86,15 @@ public class PersonControllerTest {
     }
 
     @Test
-    void deletePerson_shouldReturn500_whenNotFound() {
-        doThrow(new RuntimeException("Personne non trouvée pour suppression")).when(personService).delete("Unknown", "Person");
-        assertThrows(Exception.class, () -> mockMvc.perform(delete("/person")
-                .param("firstName", "Unknown")
-                .param("lastName", "Person")));
+    void deletePerson_shouldReturn500_whenNotFound() throws Exception {
+        doThrow(new RuntimeException("Personne non trouvée pour suppression"))
+                .when(personService).delete("Unknown", "Person");
+
+        mockMvc.perform(delete("/person")
+                        .param("firstName", "Unknown")
+                        .param("lastName", "Person"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 }

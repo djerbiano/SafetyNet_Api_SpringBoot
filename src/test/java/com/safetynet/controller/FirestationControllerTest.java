@@ -15,8 +15,6 @@ import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
@@ -66,10 +64,15 @@ public class FirestationControllerTest {
 
     @Test
     void updateFirestation_shouldReturn500_whenNotFound() throws Exception {
-        when(firestationService.update(any(Firestation.class))).thenThrow(new RuntimeException("Adresse non trouvée"));
-        assertThrows(Exception.class, () -> mockMvc.perform(put("/firestation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(firestation))));
+        when(firestationService.update(any(Firestation.class)))
+                .thenThrow(new RuntimeException("Adresse non trouvée"));
+
+        mockMvc.perform(put("/firestation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(firestation)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 
     @Test
@@ -82,9 +85,14 @@ public class FirestationControllerTest {
 
     @Test
     void deleteFirestation_shouldReturn500_whenNotFound() throws Exception {
-        doThrow(new RuntimeException("Adresse non trouvée")).when(firestationService).delete("Unknown");
-        assertThrows(Exception.class, () -> mockMvc.perform(delete("/firestation")
-                .param("address", "Unknown")));
+        doThrow(new RuntimeException("Adresse non trouvée"))
+                .when(firestationService).delete("Unknown");
+
+        mockMvc.perform(delete("/firestation")
+                        .param("address", "Unknown"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("Internal server error"));
     }
 
 
