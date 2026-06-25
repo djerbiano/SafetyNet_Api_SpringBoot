@@ -59,8 +59,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         logger.error("Erreur inattendue : {}", ex.getMessage(), ex);
+        String message = ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred.";
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error",
-                "An unexpected error occurred.");
+                message);
     }
 
     /**

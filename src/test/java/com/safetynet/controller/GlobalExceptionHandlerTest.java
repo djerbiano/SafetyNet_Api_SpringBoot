@@ -54,6 +54,6 @@ public class GlobalExceptionHandlerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.error").value("Internal server error"))
-                .andExpect(jsonPath("$.message").value("An unexpected error occurred."));
+                .andExpect(jsonPath("$.message").value("Erreur imprévue"));
     }
 }
